@@ -8,6 +8,12 @@ module.exports = function(app) {
 	var loginBase = 'http://login.dfinder.cn/';
 	var cookieChange = {}; // 模拟浏览器Cookie
 
+	app.options('/platform/:action', function(req, res) {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+		next();
+	});
+
 	app.get('/platform/:action', function(req, res) {
 		var action = req.param('action');
 		var before = dpsBase; // 默认前缀
@@ -43,7 +49,7 @@ module.exports = function(app) {
 		app.post('/platform/:action', function(req, res) {
 			var action = req.param('action');
 			var before = dpsBase; // 默认前缀
-			var options = {}; // 请求配置项
+			var options = {json: true}; // 请求配置项
 
 			switch(action) {
 				case 'login.do':
@@ -59,7 +65,8 @@ module.exports = function(app) {
 			options.headers.Cookie = joinCookies();
 			request.post(options, function(error, response, body) {
 				saveCookies(response);
-				res.json(response);
+				res.header('Access-Control-Allow-Origin', 'http://test.dfinder.cn:3000');
+				res.json(body);
 			});
 		});
 
